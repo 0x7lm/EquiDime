@@ -26,6 +26,8 @@ pragma solidity 0.8.23;
 
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {EquiDime} from "./EquiDime.sol";
+import {collateralActions} from "./CollateralAuctions.sol";
+import {liquidator} from "./Liquidator.sol";
 
 /*
  * @title EDEngine
@@ -49,9 +51,15 @@ import {EquiDime} from "./EquiDime.sol";
 
 contract EDEngine is ReentrancyGuard {
     EquiDime private immutable i_edc;
-    // address private immutable i_tokenCollateralAddress;
+    collateralActions private immutable i_colaction;
+    liquidator private immutable i_liq;
 
-    constructor() {}
+    constructor(address[] memory tokenAddresses, address[] memory priceFeedAddresses) {
+        i_edc = EquiDime(address(this));
+        i_colaction = new collateralActions(address(this), tokenAddresses, priceFeedAddresses);
+        i_liq = liquidator(address(this));
+    }
+
     function depositCollateralAndMintEDC() external {}
     // Deposit wETH || wBTC
 

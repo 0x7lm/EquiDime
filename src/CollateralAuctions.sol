@@ -12,11 +12,13 @@ contract collateralActions is ConfirmedOwner, ReentrancyGuard {
     error CA__FaildCollateralTransfer();
 
     address private engineAddress;
-
+    address[] private tokenAddresses;
+    address[] private priceFeedsAddresses;
 
     // token address and its priceFeed
     mapping(address token => address priceFeed) private s_priceFeeds;
-    mapping (address user => mapping(address token => uint256 amountToken)) private s_collateralDeposited;
+    mapping(address user => mapping(address token => uint256 amountToken)) internal s_collateralDeposited;
+    mapping(address user => uint256 decAmount) internal s_decMinted;
 
     modifier moreThanZero(uint256 amount) {
         if (amount == 0) {
@@ -32,10 +34,13 @@ contract collateralActions is ConfirmedOwner, ReentrancyGuard {
         _;
     }
 
-    constructor(address Owner, address[] memory tokenAddresses, address[] memory priceFeedsAddresses)
+    constructor(address Owner, address[] memory _tokenAddresses, address[] memory _priceFeedsAddresses)
         ConfirmedOwner(Owner)
     {
         Owner = engineAddress;
+        _tokenAddresses = tokenAddresses;
+        _priceFeedsAddresses = priceFeedsAddresses;
+
         if (tokenAddresses.length != priceFeedsAddresses.length) {
             revert CA__TokenAddressesAndPriceFeedsAddressesShouldBeSameLength();
         }
@@ -45,14 +50,10 @@ contract collateralActions is ConfirmedOwner, ReentrancyGuard {
     }
 
     function depositCollateral(
-        address caller,                 // The user address
+        address caller, // The user address
         address tokenCollateralAddress, // @param token Collateral Address to chose wETH || wBTC
-        uint256 amountCollateral        // @param Amount collateral to deposit
-    ) public 
-    moreThanZero(amountCollateral) 
-    isAlowedToken(tokenCollateralAddress) 
-    nonReentrant()
-    {
+        uint256 amountCollateral // @param Amount collateral to deposit
+    ) public moreThanZero(amountCollateral) isAlowedToken(tokenCollateralAddress) nonReentrant {
         // Add the user info into our mapping `s_collateralDeposited`
         s_collateralDeposited[caller][tokenCollateralAddress] += amountCollateral;
         // Then Transfer the collateral for the collateral token address to the engine address
@@ -60,18 +61,19 @@ contract collateralActions is ConfirmedOwner, ReentrancyGuard {
         if (!success) revert CA__FaildCollateralTransfer();
     }
 
-    function redeemCollateral(
-        address from,
-        address to,
-        address tokenCollateralAddress,
-        uint256 amountCollateral
-    ) external 
-    moreThanZero(amountCollateral)
-    isAlowedToken(tokenCollateralAddress)
-    nonReentrant()
+    function redeemCollateral(address from, address to, address tokenCollateralAddress, uint256 amountCollateral)
+        external
+        moreThanZero(amountCollateral)
+        isAlowedToken(tokenCollateralAddress)
+        nonReentrant
     {
-       s_collateralDeposited[from][tokenCollateralAddress] -= amountCollateral;
-       bool success = IERC20(tokenCollateralAddress).transfer(to, amountCollateral);
-       if (!success) revert CA__FaildCollateralTransfer();
+        s_collateralDeposited[from][tokenCollateralAddress] -= amountCollateral;
+        bool success = IERC20(tokenCollateralAddress).transfer(to, amountCollateral);
+        if (!success) revert CA__FaildCollateralTransfer();
+    }
+
+    function _getUserInformation(address _user) public view returns (uint256 decAmount, uint256 collateralAmount) {
+        collateralAmount = s_collateralDeposited[_user][address(this)];
+        decAmount = s_decMinted[_user];
     }
 }
