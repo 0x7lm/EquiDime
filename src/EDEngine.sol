@@ -25,8 +25,9 @@
 pragma solidity 0.8.23;
 
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {AggregatorV3Interface} from "@chainlink/contracts/shared/interfaces/AggregatorV3Interface.sol";
 import {EquiDime} from "./EquiDime.sol";
-import {collateralActions} from "./CollateralAuctions.sol";
+import {collateralActions} from "./CollateralActions.sol";
 import {liquidator} from "./Liquidator.sol";
 
 /*
@@ -53,6 +54,8 @@ contract EDEngine is ReentrancyGuard {
     EquiDime private immutable i_edc;
     collateralActions private immutable i_colaction;
     liquidator private immutable i_liq;
+    // AggregatorV3Interface internal dataFeed;
+
 
     constructor(address[] memory tokenAddresses, address[] memory priceFeedAddresses) {
         i_edc = EquiDime(address(this));

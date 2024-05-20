@@ -4,62 +4,58 @@ pragma solidity 0.8.23;
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {ConfirmedOwner} from "@chainlink/contracts/ConfirmedOwner.sol";
-import {CollateralAuctions} from "./CollateralAuctions.sol";
+import {AggregatorV3Interface} from "@chainlink/contracts/shared/interfaces/AggregatorV3Interface.sol";
+import {collateralActions } from "./CollateralActions.sol";
 
 contract liquidator is ConfirmedOwner, ReentrancyGuard {
+    AggregatorV3Interface internal dataFeed;
     address private engineAddress;
-    collateralActions private i_cactions;
+    collateralActions private immutable i_collateralActions;
+
+    uint256 private constant PRECISION = 1e18;
+    uint256 private constant ADDITIONAL_FEED_PRECISION = 1e10;
+    //uint256 private constant FEED_PRECISION = 1e8;
 
     constructor(address Owner) ConfirmedOwner(Owner) {
         Owner = engineAddress;
     }
 
     // 150$ worth of eth --> 75$ of our coin
-    function checkHealthFactoury(address user) public {
-        (uint256 decAmount, uint256 collateralAmount) = i_cactions._getUserInformation(_user);
+    function checkHealthFactor(address _user) public {
+        (uint256 decAmount, uint256 collateralAmount) = i_collateralActions._getUserInformation(_user);
     }
+    
+    function calculateUsdValue() public {}
+    function getUsdValue() public {}
+    function burnTokens() public {}
+    function transferCollateral() public {}
 
-    // function _getAccountInformation(address _user) public view returns (uint256 decAmount, uint256 collateralValue) {
-    //     (uint256 decAmount, uint256 collateralValue) = i_cactions._getUserInformation(_user);
-    // }
-
-    function _getUserCollateral(address _user) public view returns (uint256 userCollateral) {}
-    function addsBonus() public {}
-    function burn() public {}
-    function calculatedAmountCollateral() public {}
 
     /**
-     * Check User's Health:
+     * @notice Liquidates a user's collateral position.
      *
-     *     The function first checks the financial health 
-     *     of the user (how well they can repay their debt). 
-     *     If the user's health is okay (above a certain threshold),
-     *     the function stops and doesn't do anything further.
-     *     Calculate Collateral Needed:
-     *
-     *     If the user's health is not okay, 
-     *     the function calculates how much 
-     *     of the user's asset (collateral) is needed 
-     *     to cover the amount of debt you want to pay off.
-     *     Add a Bonus:
-     *
-     *     The function adds a 10% bonus 
-     *     to the amount of collateral needed. 
-     *     This bonus is an extra reward for the person 
-     *     (you) who is helping to fix the user's debt problem.
-     *     Burn Tokens:
-     *
-     *     The function burns (destroys) the amount 
-     *     of tokens you specified to cover the user's debt.
-     *     This helps reduce the user's debt.
-     *     Transfer Collateral:
-     *
-     *     The function takes the calculated amount of the user's collateral,
-     *     including the bonus, and gives it to you.
-     *     Check Improvement:
-     *
-     *     After all these actions, the function checks again to ensure
-     *     the user's financial health has improved. If not, it stops with an error.
+     * Steps:
+     * 1. Checks the user's health factor. If it is above the threshold, the function stops.
+     * 2. Calculates the required collateral to cover the specified debt amount.
+     * 3. Adds a 10% bonus to the calculated collateral as a reward for liquidating.
+     * 4. Burns the specified amount of tokens to reduce the user's debt.
+     * 5. Transfers the calculated collateral amount, including the bonus, to the liquidator.
+     * 6. Checks the user's health factor again to ensure it has improved. If not, it reverts.
      */
-    function liquidate() external {}
+    function liquidate(address user, uint256 debtToCover, address collateralToken) external nonReentrant {
+        (uint256 debtAmount, uint256 collateralAmount) = i_collateralActions.getUserInformation(user);
+        uint256 userHealthFactor = checkHealthFactor(user);
+        require(userHealthFactor < MIN_HEALTH_FACTOR, "Health factor is sufficient");
+
+        uint256 collateralValueInUsd = calculateUsdValue(collateralAmount, getUsdValue(collateralToken, collateralAmount));
+        uint256 collateralRequired = (debtToCover * PRECISION) / collateralValueInUsd;
+        uint256 bonus = (collateralRequired * 10) / 100;
+
+        burnTokens(debtToCover);
+        transferCollateral(user, collateralToken, collateralRequired + bonus);
+
+        uint256 newHealthFactor = checkHealthFactor(user);
+        require(newHealthFactor > userHealthFactor, "Health factor did not improve");
+    }
+
 }

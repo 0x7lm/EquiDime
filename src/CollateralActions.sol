@@ -76,4 +76,8 @@ contract collateralActions is ConfirmedOwner, ReentrancyGuard {
         collateralAmount = s_collateralDeposited[_user][address(this)];
         decAmount = s_decMinted[_user];
     }
+
+    function _getUserCollaterallToken(address token) public view returns (address _token) {
+       token = s_priceFeeds[token];
+    }
 }
