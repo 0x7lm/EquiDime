@@ -12,8 +12,12 @@ contract liquidator is ConfirmedOwner, ReentrancyGuard {
     address private engineAddress;
     collateralActions private immutable i_collateralActions;
 
+    error HealthFactorSufficient();
+    error HealthFactorNotImprove();
+
     uint256 private constant PRECISION = 1e18;
     uint256 private constant ADDITIONAL_FEED_PRECISION = 1e10;
+    uint256 private constant MIN_HEALTH_FACTOR = 1e18;
     //uint256 private constant FEED_PRECISION = 1e8;
 
     constructor(address Owner) ConfirmedOwner(Owner) {
@@ -43,9 +47,9 @@ contract liquidator is ConfirmedOwner, ReentrancyGuard {
      * 6. Checks the user's health factor again to ensure it has improved. If not, it reverts.
      */
     function liquidate(address user, uint256 debtToCover, address collateralToken) external nonReentrant {
-        (uint256 debtAmount, uint256 collateralAmount) = i_collateralActions.getUserInformation(user);
+        (uint256 debtAmount, uint256 collateralAmount) = i_collateralActions._getUserInformation(user);
         uint256 userHealthFactor = checkHealthFactor(user);
-        require(userHealthFactor < MIN_HEALTH_FACTOR, "Health factor is sufficient");
+        if (userHealthFactor > MIN_HEALTH_FACTOR) revert HealthFactorSufficient();
 
         uint256 collateralValueInUsd = calculateUsdValue(collateralAmount, getUsdValue(collateralToken, collateralAmount));
         uint256 collateralRequired = (debtToCover * PRECISION) / collateralValueInUsd;
@@ -55,7 +59,7 @@ contract liquidator is ConfirmedOwner, ReentrancyGuard {
         transferCollateral(user, collateralToken, collateralRequired + bonus);
 
         uint256 newHealthFactor = checkHealthFactor(user);
-        require(newHealthFactor > userHealthFactor, "Health factor did not improve");
+        if (newHealthFactor < userHealthFactor) revert HealthFactorNotImprove();
     }
 
 }
