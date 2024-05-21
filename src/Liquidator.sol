@@ -29,8 +29,28 @@ contract liquidator is ConfirmedOwner, ReentrancyGuard {
         (uint256 decAmount, uint256 collateralAmount) = i_collateralActions._getUserInformation(_user);
     }
     
-    function calculateUsdValue() public {}
-    function getUsdValue() public {}
+    function getCollateralPriceInUsd(address collateralToken, uint256 amount) public view returns(uint256 collateralInUsd) {
+        uint256 usdValue = getUsdValue(collateralToken) / PRECISION; // 10e8
+        // 0.4 eth * 6000$ = 2400$ worth of eth
+        collateralInUsd = amount * usdValue ;
+    }
+
+    function getUsdValue(address token) public view returns (uint256 price){
+        dataFeed = AggregatorV3Interface(token);
+        (
+            /* uint80 roundID */,
+            int price,
+            /*uint startedAt*/,
+            /*uint timeStamp*/,
+            /*uint80 answeredInRound*/
+        ) = dataFeed.latestRoundData();
+        // $100e18 USD Debt
+        // 1 ETH = 2000 USD
+        // The returned value from Chainlink will be 2000 * 1e8
+        // Most USD pairs have 8 decimals, so we will just pretend they all do
+        //return ((usdAmountInWei * PRECISION) / (uint256(price) * ADDITIONAL_FEED_PRECISION));
+    }
+
     function burnTokens() public {}
     function transferCollateral() public {}
 
