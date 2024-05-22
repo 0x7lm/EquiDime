@@ -6,80 +6,59 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol
 import {ConfirmedOwner} from "@chainlink/contracts/ConfirmedOwner.sol";
 import {AggregatorV3Interface} from "@chainlink/contracts/shared/interfaces/AggregatorV3Interface.sol";
 import {collateralActions } from "./CollateralActions.sol";
+import {EDEngine } from "./EDEngine.sol";
 
 contract liquidator is ConfirmedOwner, ReentrancyGuard {
-    AggregatorV3Interface internal dataFeed;
-    address private engineAddress;
+    AggregatorV3Interface internal priceFeed;
     collateralActions private immutable i_collateralActions;
+    EDEngine private immutable engineAddress;
+    address private immutable _caller;
+    //address[] private _priceFeeds;
 
     error HealthFactorSufficient();
     error HealthFactorNotImprove();
+    error debtToCoverMustBeMoreThanZero();
+    error notEnoughDebtToCover();
 
+    
     uint256 private constant PRECISION = 1e18;
     uint256 private constant ADDITIONAL_FEED_PRECISION = 1e10;
-    uint256 private constant MIN_HEALTH_FACTOR = 1e18;
-    //uint256 private constant FEED_PRECISION = 1e8;
+    uint256 private constant LIQUIDATION_BONUS = 10; // 10% bonus
+    uint256 private constant MIN_HEALTH_FACTOR = 1e18; // Placeholder for minimum health factor (1.0)
 
-    constructor(address Owner) ConfirmedOwner(Owner) {
-        Owner = engineAddress;
+    constructor(address owner) ConfirmedOwner(owner) {}
+
+    function getUsdValue(address collateralToken, uint256 amount) public view returns (uint256) {
+        AggregatorV3Interface priceFeed = AggregatorV3Interface(collateralToken);
+        (, int256 price, , , ) = priceFeed.latestRoundData();
+        // 1e10 = 100_00_00_00_00 
+        // 1e8  = 100_00_00_00
+        // price = 7036_00_00_00_00 * 1e10 
+        // 7036_00_00_00_00_00_00_00_00_00 * amount / 1e18 --> Amount Price 
+        return ((uint256(price) * ADDITIONAL_FEED_PRECISION) * amount) / PRECISION;
     }
-
-    // 150$ worth of eth --> 75$ of our coin
-    function checkHealthFactor(address _user) public {
-        (uint256 decAmount, uint256 collateralAmount) = i_collateralActions._getUserInformation(_user);
-    }
-    
-    function getCollateralPriceInUsd(address collateralToken, uint256 amount) public view returns(uint256 collateralInUsd) {
-        uint256 usdValue = getUsdValue(collateralToken) / PRECISION; // 10e8
-        // 0.4 eth * 6000$ = 2400$ worth of eth
-        collateralInUsd = amount * usdValue ;
-    }
-
-    function getUsdValue(address token) public view returns (uint256 price){
-        dataFeed = AggregatorV3Interface(token);
-        (
-            /* uint80 roundID */,
-            int price,
-            /*uint startedAt*/,
-            /*uint timeStamp*/,
-            /*uint80 answeredInRound*/
-        ) = dataFeed.latestRoundData();
-        // $100e18 USD Debt
-        // 1 ETH = 2000 USD
-        // The returned value from Chainlink will be 2000 * 1e8
-        // Most USD pairs have 8 decimals, so we will just pretend they all do
-        //return ((usdAmountInWei * PRECISION) / (uint256(price) * ADDITIONAL_FEED_PRECISION));
-    }
-
-    function burnTokens() public {}
-    function transferCollateral() public {}
-
 
     /**
      * @notice Liquidates a user's collateral position.
      *
      * Steps:
      * 1. Checks the user's health factor. If it is above the threshold, the function stops.
-     * 2. Calculates the required collateral to cover the specified debt amount.
+     * 2. Calculates the required collateral to cover the specified dec amount.
      * 3. Adds a 10% bonus to the calculated collateral as a reward for liquidating.
-     * 4. Burns the specified amount of tokens to reduce the user's debt.
+     * 4. Burns the specified amount of tokens to reduce the user's dec.
      * 5. Transfers the calculated collateral amount, including the bonus, to the liquidator.
      * 6. Checks the user's health factor again to ensure it has improved. If not, it reverts.
      */
-    function liquidate(address user, uint256 debtToCover, address collateralToken) external nonReentrant {
-        (uint256 debtAmount, uint256 collateralAmount) = i_collateralActions._getUserInformation(user);
-        uint256 userHealthFactor = checkHealthFactor(user);
-        if (userHealthFactor > MIN_HEALTH_FACTOR) revert HealthFactorSufficient();
+    function liquidate(address user, uint256 debtToCover, address collateralToken, address tokenCollateralAddress, uint256 amount, uint256 userDebtAmount) external nonReentrant {
+        (uint256 decAmount, ) = i_collateralActions._getUserInformation(user);
+        if(debtToCover < 0) revert debtToCoverMustBeMoreThanZero();
+        if(userDebtAmount <= debtToCover ) revert notEnoughDebtToCover();
+        uint256 collateralValueInUsd = getUsdValue(collateralToken, amount);
+        uint256 userHealthFactor = (collateralValueInUsd * PRECISION) / userDebtAmount;
+        if (userHealthFactor > MIN_HEALTH_FACTOR ) revert HealthFactorSufficient();
 
-        uint256 collateralValueInUsd = calculateUsdValue(collateralAmount, getUsdValue(collateralToken, collateralAmount));
-        uint256 collateralRequired = (debtToCover * PRECISION) / collateralValueInUsd;
-        uint256 bonus = (collateralRequired * 10) / 100;
-
-        burnTokens(debtToCover);
-        transferCollateral(user, collateralToken, collateralRequired + bonus);
-
-        uint256 newHealthFactor = checkHealthFactor(user);
-        if (newHealthFactor < userHealthFactor) revert HealthFactorNotImprove();
+        uint256 collateralToSeize = (debtToCover * PRECISION) / collateralValueInUsd;
+        uint256 bonusCollateral = (collateralToSeize * LIQUIDATION_BONUS) / 100;
     }
 
 }

@@ -19,6 +19,7 @@ contract collateralActions is ConfirmedOwner, ReentrancyGuard {
     mapping(address token => address priceFeed) private s_priceFeeds;
     mapping(address user => mapping(address token => uint256 amountToken)) internal s_collateralDeposited;
     mapping(address user => uint256 decAmount) internal s_decMinted;
+    mapping(address => uint256) internal userDebt; 
 
     modifier moreThanZero(uint256 amount) {
         if (amount == 0) {
