@@ -44,4 +44,6 @@ contract EquiDime is ERC20Burnable, ConfirmedOwner {
         }
         super.burn(_amount);
     }
+
+    
 }
