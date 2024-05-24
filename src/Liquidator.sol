@@ -4,7 +4,7 @@ pragma solidity 0.8.23;
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {ConfirmedOwner} from "@chainlink/contracts/ConfirmedOwner.sol";
-import {AggregatorV3Interface} from "@chainlink/contracts/shared/interfaces/AggregatorV3Interface.sol";
+import { AggregatorV3Interface} from "@chainlink/contracts/shared/interfaces/AggregatorV3Interface.sol";
 import {CollateralActions } from "./CollateralActions.sol";
 import {EDEngine } from "./EDEngine.sol";
 
@@ -38,9 +38,19 @@ contract Liquidator is ConfirmedOwner, ReentrancyGuard {
      * @return The USD value of the collateral.
      */
     function _getUsdValue(address collateralToken, uint256 amount) public view returns (uint256) {
-        priceFeed = AggregatorV3Interface(collateralToken);
+        AggregatorV3Interface priceFeed = AggregatorV3Interface(collateralToken);
         (, int256 price, , , ) = priceFeed.latestRoundData();
         return ((uint256(price) * ADDITIONAL_FEED_PRECISION) * amount) / PRECISION;
+    }
+
+    function _getTokenAmountFromUsd(address token, uint256 usdAmountInWei) public view returns (uint256) {
+        AggregatorV3Interface priceFeed = AggregatorV3Interface(token);
+        (, int256 price,,,) = priceFeed.latestRoundData();
+        // $100e18 USD Debt
+        // 1 ETH = 2000 USD
+        // The returned value from Chainlink will be 2000 * 1e8
+        // Most USD pairs have 8 decimals, so we will just pretend they all do
+        return ((usdAmountInWei * PRECISION) / (uint256(price) * ADDITIONAL_FEED_PRECISION));
     }
 
     /**
@@ -105,12 +115,14 @@ contract Liquidator is ConfirmedOwner, ReentrancyGuard {
         uint256 startingUserHealthFactor = _healthFactor(user);
         if (startingUserHealthFactor >= MIN_HEALTH_FACTOR) revert HealthFactorOk();
 
-        (uint256 decAmount, ) = i_coll._getUserInformation(user);
-        uint256 collateralValueInUsd = _getUsdValue(collateral, debtToCover);
-        uint256 bonusCollateral = (collateralValueInUsd * LIQUIDATION_BONUS) / LIQUIDATION_PRECISION;
-        uint256 collateralAndBonus = collateralValueInUsd + bonusCollateral;
+        uint256 tokenAmountFromDebtCovered = _getTokenAmountFromUsd(collateral, debtToCover);
+        uint256 bonusCollateral = (tokenAmountFromDebtCovered * LIQUIDATION_BONUS) / LIQUIDATION_PRECISION;
+        uint256 collateralAndBonus = tokenAmountFromDebtCovered + bonusCollateral;
 
         i_coll.redeemCollateral(user, msg.sender, collateral, collateralAndBonus);
         i_coll._burnDsc(debtToCover, user, msg.sender);
+        if (startingUserHealthFactor < MIN_HEALTH_FACTOR) revert HealthFactorNotImprove();
+        
+        revertIfHealthFactorIsBroken(user);
     }
 }

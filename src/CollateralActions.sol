@@ -59,6 +59,7 @@ contract CollateralActions is ConfirmedOwner, ReentrancyGuard {
         // Then transfer the collateral from the caller to the engine address
         bool success = IERC20(tokenCollateralAddress).transferFrom(caller, address(i_engine), amountCollateral);
         if (!success) revert CA__FailedCollateralTransfer();
+        i_engine.mintEDC(amountCollateral);
     }
 
     function redeemCollateral(

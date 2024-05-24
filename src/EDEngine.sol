@@ -51,7 +51,7 @@ import {Liquidator} from "./Liquidator.sol";
 contract EDEngine is ReentrancyGuard {
     // Immutable state variables
     EquiDime private immutable i_edc;
-    CollateralActions private immutable i_colaction;
+    CollateralActions private immutable i_col;
     Liquidator private immutable i_liq;
 
     /**
@@ -60,8 +60,8 @@ contract EDEngine is ReentrancyGuard {
      * @param priceFeedAddresses An array of price feed addresses corresponding to the collateral tokens.
      */
     constructor(address[] memory tokenAddresses, address[] memory priceFeedAddresses) {
-        i_edc = EquiDime(address(this));
-        i_colaction = new CollateralActions(address(this), tokenAddresses, priceFeedAddresses);
+        i_edc = new EquiDime(address(this));
+        i_col = new CollateralActions(address(this), tokenAddresses, priceFeedAddresses);
         i_liq = new Liquidator(address(this));
     }
 
@@ -71,6 +71,7 @@ contract EDEngine is ReentrancyGuard {
      * @param _amount The amount of EDC tokens to mint.
      */
     function mintEDC(uint256 _amount) public {
+        
         i_edc.mint(msg.sender, _amount);
     }
 
@@ -90,4 +91,5 @@ contract EDEngine is ReentrancyGuard {
     function _transferFrom(address from, uint256 value) external {
         i_edc.transferFrom(from, address(this), value);
     }
+    
 }
