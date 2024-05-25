@@ -54,20 +54,6 @@ contract Liquidator is ConfirmedOwner, ReentrancyGuard {
     }
 
     /**
-     * @notice Returns the total DSC minted and collateral value in USD for a user.
-     * @param user The address of the user.
-     * @return totalDscMinted The total DSC minted by the user.
-     * @return collateralValueInUsd The total collateral value in USD.
-     */
-    function getAccountInformation(address user)
-        external
-        view
-        returns (uint256 totalDscMinted, uint256 collateralValueInUsd)
-    {
-        return i_coll._getUserInformation(user);
-    }
-
-    /**
      * @notice Calculates the health factor for a given DSC and collateral value.
      * @param totalDscMinted The total DSC minted.
      * @param collateralValueInUsd The collateral value in USD.

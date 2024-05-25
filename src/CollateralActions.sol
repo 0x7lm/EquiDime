@@ -65,7 +65,7 @@ contract CollateralActions is ConfirmedOwner, ReentrancyGuard {
         // Then transfer the collateral from the caller to the engine address
         bool success = IERC20(tokenCollateralAddress).transferFrom(caller, address(i_engine), amountCollateral);
         if (!success) revert CA__FailedCollateralTransfer();
-        mintDsc(amountCollateral);
+        mintDsc(amountCollateral, tokenCollateralAddress);
     }
 
     function redeemCollateral(
@@ -82,22 +82,21 @@ contract CollateralActions is ConfirmedOwner, ReentrancyGuard {
     function _burnDsc(uint256 amountDecToBurn, address onBehalfOf, address decFrom) external {
         s_decMinted[onBehalfOf] -= amountDecToBurn;
         i_engine._transferFrom(decFrom, amountDecToBurn);
-        i_engine.burnEDC(amountDecToBurn);
+        i_main.burn(amountDecToBurn);
+        // i_engine.burnEDC(amountDecToBurn);
     }
     
-    function mintDsc(uint256 amountDscToMint) internal view {
-    s_decMinted[msg.sender] += amountDscToMint;
+    function mintDsc(uint256 amount, address collateralToken) internal {
+        uint256 amountEDCToMint = i_liq._getUsdValue(collateralToken, amount);
+        s_decMinted[msg.sender] += amountEDCToMint;
         i_liq.revertIfHealthFactorIsBroken(msg.sender);
-        bool minted = i_main.mint(msg.sender, amountDscToMint);
+        bool minted = i_main.mint(msg.sender, amountEDCToMint);
         if (minted != true) revert CA__MintFailed();
     }
 
-    function _getUserInformation(address user) public view returns (uint256 decAmount, uint256 collateralAmount) {
-        collateralAmount = s_collateralDeposited[user][address(this)];
-        decAmount = s_decMinted[user];
+    function _getUserInformation(address user) public view returns (uint256 dec, uint256 collateral) {
+        collateral = s_collateralDeposited[user][address(this)];
+        dec = s_decMinted[user];
     }
 
-    function _getUserCollateralToken(address token) public view returns (address) {
-        return s_priceFeeds[token];
-    }
 }

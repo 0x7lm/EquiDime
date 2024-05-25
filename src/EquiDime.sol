@@ -22,7 +22,7 @@ contract EquiDime is ERC20Burnable, ConfirmedOwner {
         controller = _controllerAddress;
     }
 
-    function mint(address _to, uint256 _amount) external onlyOwner returns (bool) {
+    function mint(address _to, uint256 _amount) public onlyOwner returns (bool) {
         if (_to == address(0)) {
             revert EquiDime__ZeroAddressPassed();
         }

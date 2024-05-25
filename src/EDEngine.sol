@@ -83,9 +83,9 @@ contract EDEngine is ReentrancyGuard {
      * @notice Burns EDC tokens from the sender.
      * @param _amount The amount of EDC tokens to burn.
      */
-    function burnEDC(uint256 _amount) external {
-        i_edc.burn(_amount);
-    }
+    // function burnEDC(uint256 _amount) public view {
+    //     i_edc.burn(_amount);
+    // }
 
     /**
      * @notice Transfers EDC tokens from one address to another.
