@@ -64,16 +64,20 @@ contract EDEngine is ReentrancyGuard {
         i_col = new CollateralActions(address(this), tokenAddresses, priceFeedAddresses);
         i_liq = new Liquidator(address(this));
     }
-
+    
+    function depositCollateralAndMintEDC(address tokenCollateralAddress, uint256 amountCollateral) external nonReentrant {
+        i_col.depositCollateral(msg.sender, tokenCollateralAddress, amountCollateral);
+        // mintEDC(_amount);
+    }
 
     /**
      * @notice Mints EDC tokens to the sender.
      * @param _amount The amount of EDC tokens to mint.
      */
-    function mintEDC(uint256 _amount) public {
+    // function mintEDC(uint256 _amount) public {
         
-        i_edc.mint(msg.sender, _amount);
-    }
+    //     i_edc.mint(msg.sender, _amount);
+    // }
 
     /**
      * @notice Burns EDC tokens from the sender.
@@ -90,6 +94,10 @@ contract EDEngine is ReentrancyGuard {
      */
     function _transferFrom(address from, uint256 value) external {
         i_edc.transferFrom(from, address(this), value);
+    }
+
+    function liquidate(address user, address token, uint256 debtToCover) external nonReentrant {
+        i_liq.liquidate(user, token, debtToCover);
     }
     
 }

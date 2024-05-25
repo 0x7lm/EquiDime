@@ -100,7 +100,7 @@ contract Liquidator is ConfirmedOwner, ReentrancyGuard {
      * @notice Reverts if the user's health factor is below the minimum threshold.
      * @param user The address of the user.
      */
-    function revertIfHealthFactorIsBroken(address user) internal view {
+    function revertIfHealthFactorIsBroken(address user) public view {
         uint256 userHealthFactor = _healthFactor(user);
         if (userHealthFactor <= MIN_HEALTH_FACTOR) revert BreaksHealthFactor();
     }

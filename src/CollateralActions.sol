@@ -5,21 +5,27 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {ConfirmedOwner} from "@chainlink/contracts/ConfirmedOwner.sol";
 import { EDEngine} from "./EDEngine.sol";
+import {EquiDime} from "./EquiDime.sol";
+import {Liquidator} from "./Liquidator.sol";
 
 contract CollateralActions is ConfirmedOwner, ReentrancyGuard {
     error CA__AmountShouldBeMoreThanZero();
     error CA__TokenAddressesAndPriceFeedsAddressesShouldBeSameLength();
     error CA__NotAllowedTokenToDeposit();
+    error CA__MintFailed();
     error CA__FailedCollateralTransfer();
 
     EDEngine private i_engine;
+    EquiDime private i_main;
+    Liquidator private i_liq;
+
     address[] private tokenAddresses;
     address[] private priceFeedsAddresses;
 
     // token address and its priceFeed
     mapping(address => address) private s_priceFeeds;
     mapping(address => mapping(address => uint256)) internal s_collateralDeposited;
-    mapping(address => uint256) internal s_decMinted;
+    mapping(address => uint256) private s_decMinted;
 
     modifier moreThanZero(uint256 amount) {
         if (amount == 0) {
@@ -59,7 +65,7 @@ contract CollateralActions is ConfirmedOwner, ReentrancyGuard {
         // Then transfer the collateral from the caller to the engine address
         bool success = IERC20(tokenCollateralAddress).transferFrom(caller, address(i_engine), amountCollateral);
         if (!success) revert CA__FailedCollateralTransfer();
-        i_engine.mintEDC(amountCollateral);
+        mintDsc(amountCollateral);
     }
 
     function redeemCollateral(
@@ -77,6 +83,13 @@ contract CollateralActions is ConfirmedOwner, ReentrancyGuard {
         s_decMinted[onBehalfOf] -= amountDecToBurn;
         i_engine._transferFrom(decFrom, amountDecToBurn);
         i_engine.burnEDC(amountDecToBurn);
+    }
+    
+    function mintDsc(uint256 amountDscToMint) internal view {
+    s_decMinted[msg.sender] += amountDscToMint;
+        i_liq.revertIfHealthFactorIsBroken(msg.sender);
+        bool minted = i_main.mint(msg.sender, amountDscToMint);
+        if (minted != true) revert CA__MintFailed();
     }
 
     function _getUserInformation(address user) public view returns (uint256 decAmount, uint256 collateralAmount) {
