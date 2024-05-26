@@ -10,25 +10,20 @@ The protocol consists of four main contracts:
 1. `EquiDime.sol` - The ERC20 token contract for EquiDime (EDC).
 2. `CollateralActions.sol` - Manages collateral deposits and redemptions.
 3. `Liquidator.sol` - Handles liquidation of undercollateralized positions.
-4. `EDEngine.sol` - The engine contract that orchestrates interactions between the other contracts.
 
 ## Contracts
 
 ### EquiDime.sol
 
-The `EquiDime` contract defines the stablecoin (EDC). It includes functions to mint and burn tokens, which can only be called by the engine contract.
+The `EquiDime` contract defines the stablecoin (EDC). It includes functions to mint and burn tokens, which can only be called by the collateralActions contract.
 
 ### CollateralActions.sol
 
-The `CollateralActions` contract handles the depositing and redeeming of collateral. It ensures that only the engine contract can call its functions, maintaining security and proper flow of operations.
+The `CollateralActions` contract handles the depositing and redeeming of collateral. It ensures that only the collateralActions contract can call its functions, maintaining security and proper flow of operations.
 
 ### Liquidator.sol
 
 The `Liquidator` contract manages the liquidation process. It interacts with the `CollateralActions` contract to redeem collateral and with the `EquiDime` contract to burn the necessary amount of tokens.
-
-### EDEngine.sol
-
-The `EDEngine` contract is the core controller of the protocol. It coordinates the interactions between `EquiDime`, `CollateralActions`, and `Liquidator` to maintain the stability and proper functioning of the system.
 
 ## Usage
 
@@ -37,7 +32,7 @@ The `EDEngine` contract is the core controller of the protocol. It coordinates t
 Users can deposit collateral and mint EDC by calling the `depositCollateralAndMintEDC` function:
 
 ```solidity
-engine.depositCollateralAndMintEDC(tokenCollateralAddress, amountCollateral);
+collateralActions.depositCollateralAndMintEDC(tokenCollateralAddress, amountCollateral);
 ```
 
 ### Mint EDC
@@ -45,7 +40,7 @@ engine.depositCollateralAndMintEDC(tokenCollateralAddress, amountCollateral);
 Users can mint additional EDC (if eligible) by calling the `mintEDC` function:
 
 ```solidity
-engine.mintEDC(amount);
+collateralActions.mintEDC(amount);
 ```
 
 ### Burn EDC
@@ -53,7 +48,7 @@ engine.mintEDC(amount);
 Users can burn EDC by calling the `burnEDC` function:
 
 ```solidity
-engine.burnEDC(amount);
+collateralActions.burnEDC(amount);
 ```
 
 ### Liquidate Under-collateralized Position
@@ -61,12 +56,12 @@ engine.burnEDC(amount);
 Liquidators can liquidate an under-collateralized position by calling the `liquidate` function:
 
 ```solidity
-engine.liquidate(user, token, debtToCover);
+collateralActions.liquidate(user, token, debtToCover);
 ```
 
 ## Security
 
-- Only the engine contract can call sensitive functions in `CollateralActions` and `EquiDime`.
+- Only the collateralActions contract can call sensitive functions in `CollateralActions` and `EquiDime`.
 - Reentrancy guards are in place to prevent reentrancy attacks.
 - Proper checks are implemented to ensure that health factors and collateralization are maintained.
 
