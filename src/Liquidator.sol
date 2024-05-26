@@ -6,12 +6,10 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol
 import {ConfirmedOwner} from "@chainlink/contracts/ConfirmedOwner.sol";
 import { AggregatorV3Interface} from "@chainlink/contracts/shared/interfaces/AggregatorV3Interface.sol";
 import {CollateralActions } from "./CollateralActions.sol";
-import {EDEngine } from "./EDEngine.sol";
 
 contract Liquidator is ConfirmedOwner, ReentrancyGuard {
     AggregatorV3Interface internal priceFeed;
     CollateralActions private immutable i_coll;
-    EDEngine private immutable i_engine;
     address private immutable _caller;
 
     error HealthFactorSufficient();

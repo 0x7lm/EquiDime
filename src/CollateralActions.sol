@@ -4,7 +4,6 @@ pragma solidity 0.8.23;
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {ConfirmedOwner} from "@chainlink/contracts/ConfirmedOwner.sol";
-import { EDEngine} from "./EDEngine.sol";
 import {EquiDime} from "./EquiDime.sol";
 import {Liquidator} from "./Liquidator.sol";
 
@@ -15,12 +14,11 @@ contract CollateralActions is ConfirmedOwner, ReentrancyGuard {
     error CA__MintFailed();
     error CA__FailedCollateralTransfer();
 
-    EDEngine private i_engine;
     EquiDime private i_main;
     Liquidator private i_liq;
 
-    address[] private tokenAddresses;
-    address[] private priceFeedsAddresses;
+    // address[] private tokenAddresses;
+    // address[] private priceFeedsAddresses;
 
     // token address and its priceFeed
     mapping(address => address) private s_priceFeeds;
@@ -44,14 +42,14 @@ contract CollateralActions is ConfirmedOwner, ReentrancyGuard {
     constructor(address owner, address[] memory _tokenAddresses, address[] memory _priceFeedsAddresses)
         ConfirmedOwner(owner)
     {
-        tokenAddresses = _tokenAddresses;
-        priceFeedsAddresses = _priceFeedsAddresses;
+        // tokenAddresses = _tokenAddresses;
+        // priceFeedsAddresses = _priceFeedsAddresses;
 
-        if (tokenAddresses.length != priceFeedsAddresses.length) {
+        if (_tokenAddresses.length != _priceFeedsAddresses.length) {
             revert CA__TokenAddressesAndPriceFeedsAddressesShouldBeSameLength();
         }
-        for (uint256 i = 0; i < tokenAddresses.length; i++) {
-            s_priceFeeds[tokenAddresses[i]] = priceFeedsAddresses[i];
+        for (uint256 i = 0; i < _tokenAddresses.length; i++) {
+            s_priceFeeds[_tokenAddresses[i]] = _priceFeedsAddresses[i];
         }
     }
 
@@ -62,8 +60,8 @@ contract CollateralActions is ConfirmedOwner, ReentrancyGuard {
     ) public moreThanZero(amountCollateral) isAllowedToken(tokenCollateralAddress) nonReentrant {
         // Add the user info into our mapping `s_collateralDeposited`
         s_collateralDeposited[caller][tokenCollateralAddress] += amountCollateral;
-        // Then transfer the collateral from the caller to the engine address
-        bool success = IERC20(tokenCollateralAddress).transferFrom(caller, address(i_engine), amountCollateral);
+        // Then transfer the collateral from the caller to the collateral address
+        bool success = IERC20(tokenCollateralAddress).transferFrom(caller, address(this), amountCollateral);
         if (!success) revert CA__FailedCollateralTransfer();
         mintDsc(amountCollateral, tokenCollateralAddress);
     }
@@ -81,9 +79,8 @@ contract CollateralActions is ConfirmedOwner, ReentrancyGuard {
 
     function _burnDsc(uint256 amountDecToBurn, address onBehalfOf, address decFrom) external {
         s_decMinted[onBehalfOf] -= amountDecToBurn;
-        i_engine._transferFrom(decFrom, amountDecToBurn);
+        i_main.transferFrom(decFrom, address(this), amountDecToBurn);
         i_main.burn(amountDecToBurn);
-        // i_engine.burnEDC(amountDecToBurn);
     }
     
     function mintDsc(uint256 amount, address collateralToken) internal {
