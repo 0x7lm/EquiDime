@@ -27,19 +27,18 @@ contract HelperConfig is Script {
 
         //AggMock = MockAggregator(0x123);
 
-        AggMock.setLatestAnswer(2000e8);
-        MockAggregator ethUsdPriceFeed = AggMock.latestAnswer();
+        //AggMock.setLatestAnswer(2000e8);
+        MockAggregator ethUsdPriceFeed = new MockAggregator();
         ERC20Mock wethMock = new ERC20Mock();
 
-        AggMock.setLatestAnswer(1000e8);
-        uint256 ansowr = AggMock.latestAnswer();
-        MockAggregator btcUsdPriceFeed = ansowr;
+        //AggMock.setLatestAnswer(1000e8);
+        MockAggregator btcUsdPriceFeed = new MockAggregator();
         ERC20Mock wbtcMock = new ERC20Mock();
 
         anvilNetworkConfig = NetworkConfig({
-            wethUsdPriceFeed: ethUsdPriceFeed,
+            wethUsdPriceFeed: address(ethUsdPriceFeed),
             weth: address(wethMock),
-            wbtcUsdPriceFeed: btcUsdPriceFeed,
+            wbtcUsdPriceFeed: address(btcUsdPriceFeed),
             wbtc: address(wbtcMock),
             deployerKey: DEFAULT_ANVIL_PRIVATE_KEY
         });
