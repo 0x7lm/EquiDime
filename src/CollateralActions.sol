@@ -7,7 +7,7 @@ import {ConfirmedOwner} from "@chainlink/contracts/ConfirmedOwner.sol";
 import {EquiDime} from "./EquiDime.sol";
 import {Liquidator} from "./Liquidator.sol";
 
-contract CollateralActions is ConfirmedOwner, ReentrancyGuard {
+contract CollateralActions is ReentrancyGuard {
     error CA__AmountShouldBeMoreThanZero();
     error CA__TokenAddressesAndPriceFeedsAddressesShouldBeSameLength();
     error CA__NotAllowedTokenToDeposit();
@@ -39,8 +39,8 @@ contract CollateralActions is ConfirmedOwner, ReentrancyGuard {
         _;
     }
 
-    constructor(address owner, address[] memory _tokenAddresses, address[] memory _priceFeedsAddresses)
-        ConfirmedOwner(owner)
+    constructor(address[] memory _tokenAddresses, address[] memory _priceFeedsAddresses)
+        // ConfirmedOwner(owner)
     {
         // tokenAddresses = _tokenAddresses;
         // priceFeedsAddresses = _priceFeedsAddresses;

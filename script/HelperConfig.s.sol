@@ -18,8 +18,6 @@ contract HelperConfig is Script {
         uint256 deployerKey;
     }
 
-    uint256 public constant DEFAULT_ANVIL_PRIVATE_KEY = 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
-
     function getOrCreateAnvilEthConfig() public returns (NetworkConfig memory anvilNetworkConfig) {
         if (activeNetworkConfig.wethUsdPriceFeed != address(0)) {
             return activeNetworkConfig;
@@ -40,7 +38,7 @@ contract HelperConfig is Script {
             weth: address(wethMock),
             wbtcUsdPriceFeed: address(btcUsdPriceFeed),
             wbtc: address(wbtcMock),
-            deployerKey: DEFAULT_ANVIL_PRIVATE_KEY
+            deployerKey: 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
         });
 
         activeNetworkConfig = anvilNetworkConfig;

@@ -1,0 +1,348 @@
+{
+  "contracts": {
+    "lib/chainlink-brownie-contracts/contracts/src/v0.8/mocks/MockAggregator.sol": {
+      "MockAggregator": {
+        "abi": [
+          {
+            "inputs": [],
+            "name": "latestAnswer",
+            "outputs": [
+              {
+                "internalType": "int256",
+                "name": "",
+                "type": "int256"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "s_answer",
+            "outputs": [
+              {
+                "internalType": "int256",
+                "name": "",
+                "type": "int256"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "int256",
+                "name": "answer",
+                "type": "int256"
+              }
+            ],
+            "name": "setLatestAnswer",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          }
+        ],
+        "metadata": {
+          "optimizer_settings": {
+            "is_debug_logging_enabled": false,
+            "is_fallback_to_size_enabled": false,
+            "is_system_request_memoization_disabled": true,
+            "is_verify_each_enabled": false,
+            "jump_table_density_threshold": null,
+            "level_back_end": "Aggressive",
+            "level_middle_end": "Aggressive",
+            "level_middle_end_size": "Zero"
+          },
+          "solc_metadata": "{\"compiler\":{\"version\":\"0.8.23+commit.f704f362\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"latestAnswer\",\"outputs\":[{\"internalType\":\"int256\",\"name\":\"\",\"type\":\"int256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"s_answer\",\"outputs\":[{\"internalType\":\"int256\",\"name\":\"\",\"type\":\"int256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"int256\",\"name\":\"answer\",\"type\":\"int256\"}],\"name\":\"setLatestAnswer\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"lib/chainlink-brownie-contracts/contracts/src/v0.8/mocks/MockAggregator.sol\":\"MockAggregator\"},\"evmVersion\":\"shanghai\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"details\":{\"constantOptimizer\":false,\"cse\":false,\"deduplicate\":false,\"inliner\":false,\"jumpdestRemover\":false,\"orderLiterals\":false,\"peephole\":false,\"simpleCounterForLoopUncheckedIncrement\":true,\"yul\":true,\"yulDetails\":{\"optimizerSteps\":\"dhfoDgvulfnTUtnIf[xa[r]EscLMcCTUtTOntnfDIulLculVcul [j]Tpeulxa[rul]xa[r]cLgvifCTUca[r]LSsTFOtfDnca[r]Iulc]jmul[jul] VcTOcul jmul:fDnTOcmu\",\"stackAllocation\":true}},\"runs\":200},\"remappings\":[\":@chainlink/contracts/=lib/chainlink-brownie-contracts/contracts/src/v0.8/\",\":@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/\",\":chainlink-brownie-contracts/=lib/chainlink-brownie-contracts/contracts/src/v0.6/vendor/@arbitrum/nitro-contracts/src/\",\":ds-test/=lib/openzeppelin-contracts/lib/forge-std/lib/ds-test/src/\",\":erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/\",\":forge-std/=lib/forge-std/src/\",\":openzeppelin-contracts/=lib/openzeppelin-contracts/\"]},\"sources\":{\"lib/chainlink-brownie-contracts/contracts/src/v0.8/mocks/MockAggregator.sol\":{\"keccak256\":\"0x8492340c967352dec52d8a607ee403a86eb287a4cd8e2fad5ce85860030a0e6a\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://2d34ab9cea4222130919e7be8298405d659f172a87fe53341f888a01130bd575\",\"dweb:/ipfs/QmV9HMU5daPgYLYkx2dMgVF1Gno2kvBgNFddFepUYzAVEH\"]}},\"version\":1}",
+          "solc_version": "0.8.23",
+          "solc_zkvm_edition": null,
+          "zk_version": "1.4.1"
+        },
+        "evm": {
+          "legacyAssembly": null,
+          "assembly": "\t.text\n\t.file\t\"MockAggregator.sol:MockAggregator\"\n\t.globl\t__entry\n__entry:\n.func_begin0:\n\tadd\t128, r0, r3\n\tst.1\t64, r3\n\tadd\tr1, r0, r3\n\tshr.s\t96, r3, r3\n\tand\t@CPI0_0[0], r3, r3\n\tand!\t1, r2, r2\n\tjump.ne\t@.BB0_1\n\tsub.s!\t4, r3, r2\n\tjump.lt\t@.BB0_2\n\tld\tr1, r2\n\tshr.s\t224, r2, r2\n\tsub.s!\t@CPI0_2[0], r2, r4\n\tjump.eq\t@.BB0_11\n\tsub.s!\t@CPI0_3[0], r2, r4\n\tjump.eq\t@.BB0_11\n\tsub.s!\t@CPI0_4[0], r2, r2\n\tjump.ne\t@.BB0_2\n\tcontext.get_context_u128\tr2\n\tsub.s!\t36, r3, r3\n\tjump.lt\t@.BB0_2\n\tsub!\tr2, r0, r2\n\tjump.ne\t@.BB0_2\n\tptr.add.s\t4, r1, r1\n\tld\tr1, r1\n\tsstore\tr0, r1\n\tadd\tr0, r0, r1\n\tret.ok.to_label\tr1, @DEFAULT_FAR_RETURN\n.BB0_1:\n\tcontext.get_context_u128\tr1\n\tsub!\tr1, r0, r1\n\tjump.ne\t@.BB0_2\n\tadd\t32, r0, r1\n\tst.2\t256, r1\n\tst.2\t288, r0\n\tadd\t@CPI0_1[0], r0, r1\n\tret.ok.to_label\tr1, @DEFAULT_FAR_RETURN\n.BB0_11:\n\tcontext.get_context_u128\tr1\n\tsub!\tr1, r0, r1\n\tjump.ne\t@.BB0_2\n\tsload\tr0, r1\n\tst.1\t128, r1\n\tadd\t@CPI0_5[0], r0, r1\n\tret.ok.to_label\tr1, @DEFAULT_FAR_RETURN\n.BB0_2:\n\tadd\tr0, r0, r1\n\tret.revert.to_label\tr1, @DEFAULT_FAR_REVERT\n.func_end0:\n\n\t.note.GNU-stack\n\t.rodata\nCPI0_0:\n\t.cell 4294967295\nCPI0_1:\n\t.cell 53919893334301279589334030174039261352344891250716429051063678533632\nCPI0_2:\n\t.cell 1355963341\nCPI0_3:\n\t.cell 811442907\nCPI0_4:\n\t.cell 82483120\nCPI0_5:\n\t.cell 2535301202817642044428229017600\n",
+          "bytecode": {
+            "object": "0000008003000039000000400030043f000000000301001900000060033002700000000c0330019700000001022001900000001b0000c13d000000040230008c0000002a0000413d000000000201043b000000e0022002700000000e0420009c000000230000613d0000000f0420009c000000230000613d000000100220009c0000002a0000c13d0000000002000416000000240330008c0000002a0000413d000000000202004b0000002a0000c13d0000000401100370000000000101043b000000000010041b00000000010000190000002d0001042e0000000001000416000000000101004b0000002a0000c13d0000002001000039000001000010044300000120000004430000000d010000410000002d0001042e0000000001000416000000000101004b0000002a0000c13d000000000100041a000000800010043f00000011010000410000002d0001042e00000000010000190000002e000104300000002c000004320000002d0001042e0000002e00010430000000000000000000000000000000000000000000000000000000000000000000000000ffffffff00000002000000000000000000000000000000400000010000000000000000000000000000000000000000000000000000000000000000000000000050d25bcd00000000000000000000000000000000000000000000000000000000305da2db0000000000000000000000000000000000000000000000000000000004ea97b00000000000000000000000000000000000000020000000800000000000000000c72b3837a90c453ab696d1ed5c5c009e591df254c325036548365075d7f443d6"
+          },
+          "methodIdentifiers": {
+            "latestAnswer()": "50d25bcd",
+            "s_answer()": "305da2db",
+            "setLatestAnswer(int256)": "04ea97b0"
+          }
+        },
+        "irOptimized": "/// @use-src 0:\"lib/chainlink-brownie-contracts/contracts/src/v0.8/mocks/MockAggregator.sol\"\nobject \"MockAggregator_22\" {\n    code {\n        {\n            /// @src 0:57:272  \"contract MockAggregator {...\"\n            let _1 := memoryguard(0x80)\n            mstore(64, _1)\n            if callvalue() { revert(0, 0) }\n            let _2 := datasize(\"MockAggregator_22_deployed\")\n            codecopy(_1, dataoffset(\"MockAggregator_22_deployed\"), _2)\n            return(_1, _2)\n        }\n    }\n    /// @use-src 0:\"lib/chainlink-brownie-contracts/contracts/src/v0.8/mocks/MockAggregator.sol\"\n    object \"MockAggregator_22_deployed\" {\n        code {\n            {\n                /// @src 0:57:272  \"contract MockAggregator {...\"\n                let _1 := memoryguard(0x80)\n                mstore(64, _1)\n                if iszero(lt(calldatasize(), 4))\n                {\n                    switch shr(224, calldataload(0))\n                    case 0x04ea97b0 {\n                        if callvalue() { revert(0, 0) }\n                        if slt(add(calldatasize(), not(3)), 32) { revert(0, 0) }\n                        sstore(0, calldataload(4))\n                        return(0, 0)\n                    }\n                    case 0x305da2db {\n                        if callvalue() { revert(0, 0) }\n                        if slt(add(calldatasize(), not(3)), 0) { revert(0, 0) }\n                        mstore(_1, sload(0))\n                        return(_1, 32)\n                    }\n                    case 0x50d25bcd {\n                        if callvalue() { revert(0, 0) }\n                        if slt(add(calldatasize(), not(3)), 0) { revert(0, 0) }\n                        let _2 := sload(0)\n                        let memPos := mload(64)\n                        mstore(memPos, _2)\n                        return(memPos, 32)\n                    }\n                }\n                revert(0, 0)\n            }\n        }\n        data \".metadata\" hex\"a2646970667358221220e96b70f4547ef69243d8548dbf1ad5099a26305b9bb2ff6705f0ae0576e5702964736f6c63430008170033\"\n    }\n}\n",
+        "hash": "010000133c5c0faec1758ac32c650965295f5ecd86cda46c9774e92fa19bfe27",
+        "factoryDependencies": {}
+      }
+    }
+  },
+  "sources": {
+    "lib/chainlink-brownie-contracts/contracts/src/v0.8/mocks/MockAggregator.sol": {
+      "id": 0,
+      "ast": {
+        "absolutePath": "lib/chainlink-brownie-contracts/contracts/src/v0.8/mocks/MockAggregator.sol",
+        "exportedSymbols": {
+          "MockAggregator": [
+            22
+          ]
+        },
+        "id": 23,
+        "license": "MIT",
+        "nodeType": "SourceUnit",
+        "nodes": [
+          {
+            "id": 1,
+            "literals": [
+              "solidity",
+              "^",
+              "0.8",
+              ".0"
+            ],
+            "nodeType": "PragmaDirective",
+            "src": "32:23:0"
+          },
+          {
+            "abstract": false,
+            "baseContracts": [],
+            "canonicalName": "MockAggregator",
+            "contractDependencies": [],
+            "contractKind": "contract",
+            "fullyImplemented": true,
+            "id": 22,
+            "linearizedBaseContracts": [
+              22
+            ],
+            "name": "MockAggregator",
+            "nameLocation": "66:14:0",
+            "nodeType": "ContractDefinition",
+            "nodes": [
+              {
+                "constant": false,
+                "functionSelector": "305da2db",
+                "id": 3,
+                "mutability": "mutable",
+                "name": "s_answer",
+                "nameLocation": "99:8:0",
+                "nodeType": "VariableDeclaration",
+                "scope": 22,
+                "src": "85:22:0",
+                "stateVariable": true,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_int256",
+                  "typeString": "int256"
+                },
+                "typeName": {
+                  "id": 2,
+                  "name": "int256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "85:6:0",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_int256",
+                    "typeString": "int256"
+                  }
+                },
+                "visibility": "public"
+              },
+              {
+                "body": {
+                  "id": 12,
+                  "nodeType": "Block",
+                  "src": "159:28:0",
+                  "statements": [
+                    {
+                      "expression": {
+                        "id": 10,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftHandSide": {
+                          "id": 8,
+                          "name": "s_answer",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 3,
+                          "src": "165:8:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_int256",
+                            "typeString": "int256"
+                          }
+                        },
+                        "nodeType": "Assignment",
+                        "operator": "=",
+                        "rightHandSide": {
+                          "id": 9,
+                          "name": "answer",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 5,
+                          "src": "176:6:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_int256",
+                            "typeString": "int256"
+                          }
+                        },
+                        "src": "165:17:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_int256",
+                          "typeString": "int256"
+                        }
+                      },
+                      "id": 11,
+                      "nodeType": "ExpressionStatement",
+                      "src": "165:17:0"
+                    }
+                  ]
+                },
+                "functionSelector": "04ea97b0",
+                "id": 13,
+                "implemented": true,
+                "kind": "function",
+                "modifiers": [],
+                "name": "setLatestAnswer",
+                "nameLocation": "121:15:0",
+                "nodeType": "FunctionDefinition",
+                "parameters": {
+                  "id": 6,
+                  "nodeType": "ParameterList",
+                  "parameters": [
+                    {
+                      "constant": false,
+                      "id": 5,
+                      "mutability": "mutable",
+                      "name": "answer",
+                      "nameLocation": "144:6:0",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 13,
+                      "src": "137:13:0",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_int256",
+                        "typeString": "int256"
+                      },
+                      "typeName": {
+                        "id": 4,
+                        "name": "int256",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "137:6:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_int256",
+                          "typeString": "int256"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "src": "136:15:0"
+                },
+                "returnParameters": {
+                  "id": 7,
+                  "nodeType": "ParameterList",
+                  "parameters": [],
+                  "src": "159:0:0"
+                },
+                "scope": 22,
+                "src": "112:75:0",
+                "stateMutability": "nonpayable",
+                "virtual": false,
+                "visibility": "public"
+              },
+              {
+                "body": {
+                  "id": 20,
+                  "nodeType": "Block",
+                  "src": "244:26:0",
+                  "statements": [
+                    {
+                      "expression": {
+                        "id": 18,
+                        "name": "s_answer",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 3,
+                        "src": "257:8:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_int256",
+                          "typeString": "int256"
+                        }
+                      },
+                      "functionReturnParameters": 17,
+                      "id": 19,
+                      "nodeType": "Return",
+                      "src": "250:15:0"
+                    }
+                  ]
+                },
+                "functionSelector": "50d25bcd",
+                "id": 21,
+                "implemented": true,
+                "kind": "function",
+                "modifiers": [],
+                "name": "latestAnswer",
+                "nameLocation": "200:12:0",
+                "nodeType": "FunctionDefinition",
+                "parameters": {
+                  "id": 14,
+                  "nodeType": "ParameterList",
+                  "parameters": [],
+                  "src": "212:2:0"
+                },
+                "returnParameters": {
+                  "id": 17,
+                  "nodeType": "ParameterList",
+                  "parameters": [
+                    {
+                      "constant": false,
+                      "id": 16,
+                      "mutability": "mutable",
+                      "name": "",
+                      "nameLocation": "-1:-1:-1",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 21,
+                      "src": "236:6:0",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_int256",
+                        "typeString": "int256"
+                      },
+                      "typeName": {
+                        "id": 15,
+                        "name": "int256",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "236:6:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_int256",
+                          "typeString": "int256"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "src": "235:8:0"
+                },
+                "scope": 22,
+                "src": "191:79:0",
+                "stateMutability": "view",
+                "virtual": false,
+                "visibility": "public"
+              }
+            ],
+            "scope": 23,
+            "src": "57:215:0",
+            "usedErrors": [],
+            "usedEvents": []
+          }
+        ],
+        "src": "32:241:0"
+      }
+    }
+  },
+  "errors": [],
+  "version": "0.8.23",
+  "long_version": "0.8.23+commit.f704f362.Linux.g++",
+  "zk_version": "1.4.1"
+}

@@ -18,9 +18,7 @@ contract EquiDime is ERC20Burnable, ConfirmedOwner {
     address private controller;
 
     //Functions
-    constructor(address _controllerAddress) ERC20("EquiDime", "EQD") ConfirmedOwner(controller) {
-        controller = _controllerAddress;
-    }
+    constructor(address controller) ERC20("EquiDime", "EQD") ConfirmedOwner(controller) {}
 
     function mint(address _to, uint256 _amount) public onlyOwner returns (bool) {
         if (_to == address(0)) {
